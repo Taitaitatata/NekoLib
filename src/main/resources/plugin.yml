@@ -1,0 +1,4 @@
+name: NekoLib
+version: '${project.version}'
+main: net.nekozouneko.nekolib.NekoLib
+api-version: '1.20'
