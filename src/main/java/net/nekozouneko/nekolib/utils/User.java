@@ -1,8 +1,10 @@
 package net.nekozouneko.nekolib.utils;
 
+import net.nekozouneko.nekolib.NekoLib;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.sql.ResultSet;
 import java.util.UUID;
@@ -113,6 +115,34 @@ public class User {
         FileConfiguration config = Bukkit.getPluginManager().getPlugin("NekoLib").getConfig();
         DataBase db = new DataBase(config.getString("database.url"), config.getString("database.user"), config.getString("database.pass"));
         db.executeUpdate("UPDATE users SET money = " + money + " WHERE id = '" + userId + "'");
+        db.close();
+    }
+
+    public int getExp() {
+        /* expを取得する */
+        int exp = 0;
+        Yaml yaml = new Yaml("config", NekoLib.getPlugin());
+        YamlConfiguration yamlConfig = yaml.get();
+        DataBase db = new DataBase(yamlConfig.getString("database.url"), yamlConfig .getString("database.user"), yamlConfig.getString("database.pass"));
+        ResultSet rs = db.executeQuery("SELECT money FROM users WHERE userid = '" + this.userId + "'");
+        try {
+            // dbからのnameの取得を試みる
+            while (rs.next()) {
+                exp = rs.getInt("exp");
+            }
+        }catch (Exception e) {
+            // dbからのnameの取得に失敗したなら
+        }
+        db.close();
+        return exp;
+    }
+
+    public void setExp(int money) {
+        /* expを設定する */
+        Yaml yaml = new Yaml("config", NekoLib.getPlugin());
+        YamlConfiguration yamlConfig = yaml.get();
+        DataBase db = new DataBase(yamlConfig.getString("database.url"), yamlConfig .getString("database.user"), yamlConfig.getString("database.pass"));
+        db.executeUpdate("UPDATE users SET exp = " + money + " WHERE userid = '" + this.userId + "'");
         db.close();
     }
 }
