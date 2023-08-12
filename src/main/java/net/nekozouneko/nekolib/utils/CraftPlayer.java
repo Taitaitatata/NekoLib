@@ -1,5 +1,6 @@
 package net.nekozouneko.nekolib.utils;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,59 +14,35 @@ public class CraftPlayer {
 
     public static boolean isOnline(String name) {
         /* オンラインかを判定する: name */
-        boolean online = false;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getName().equals(name)) {
-                online = true;
-                break;
-            }
-        }
-        return online;
+        return Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName) // プレイヤー名のみの内容にし
+                .anyMatch(name::equals); // 同じ名前のものが一つでもあったらtrue
     }
 
     public static boolean isOnline(UUID uuid) {
         /* オンラインかを判定する: uuid */
-        boolean online = false;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getUniqueId().equals(uuid)) {
-                online = true;
-                break;
-            }
-        }
-        return online;
+        return Bukkit.getPlayer(uuid) != null; // 同一UUIDのプレイヤーがオンラインじゃなければnullを返す
     }
 
     public static boolean hasScoreboardTag(Player player, String scoreboardTag) {
         /* scoreboardTagを持つかを判定する: player */
-        for (String tag : player.getScoreboardTags()) {
-            if (tag.equals(scoreboardTag)) {
-                // 一致するなら
-                return true;
-            }
-        }
-        return false;
+        return player.getScoreboardTags().contains(scoreboardTag); // getScoreboardTagsに含まれていればtrue
     }
 
     public static boolean hasScoreboardTag(String name, String scoreboardTag) {
         /* scoreboardTagを持つかを判定する: name */
-        for (String tag : Bukkit.getServer().getPlayer(name).getScoreboardTags()) {
-            if (tag.equals(scoreboardTag)) {
-                // 一致するなら
-                return true;
-            }
-        }
-        return false;
+        Player p = Bukkit.getPlayer(name);
+        if (p == null) return false; // p == nullならエラーを吐く
+
+        return hasScoreboardTag(p, scoreboardTag);
     }
 
     public static boolean hasScoreboardTag(UUID uuid, String scoreboardTag) {
         /* scoreboardTagを持つかを判定する: name */
-        for (String tag : Bukkit.getServer().getPlayer(uuid).getScoreboardTags()) {
-            if (tag.equals(scoreboardTag)) {
-                // 一致するなら
-                return true;
-            }
-        }
-        return false;
+        Player p = Bukkit.getPlayer(uuid);
+        if (p == null) return false; // p == nullならエラーを吐く
+
+        return hasScoreboardTag(p, scoreboardTag);
     }
 
     public static ItemStack getHead(Player player) {
